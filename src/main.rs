@@ -1,21 +1,35 @@
 use redb::{Database, ReadableTable, TableDefinition};
 use std::env;
-use std::process;
+use std::io::{self, Write};
 
 const IMU_DATA_TABLE: TableDefinition<String, String> = TableDefinition::new("imu_data");
 
 fn main() -> redb::Result<()> {
-    // 获取命令行参数
-    let args: Vec<String> = env::args().collect();
+    let mut db_path = String::new();
 
-    // 检查参数数量
-    if args.len() < 2 {
-        eprintln!("Usage: {} <database_path>", args[0]);
-        process::exit(1);
+    loop {
+        let args: Vec<String>;
+
+        if db_path.is_empty() {
+            // eprintln!("Usage: {} <database_path>", args[0]);
+            args = env::args().collect();
+        } else {
+            args = vec![String::from("redb"), db_path.clone()];
+        }
+
+        // 检查参数数量
+        if args.len() < 2 {
+            eprintln!("Usage: {} <database_path>", args[0]);
+            print!("Please enter the database path: ");
+            io::stdout().flush().unwrap(); // Flush stdout to display the prompt immediately
+            io::stdin().read_line(&mut db_path).unwrap();
+            db_path = db_path.trim().to_string(); // Remove trailing newline
+        } else {
+            // 获取数据库路径
+            db_path = args[1].clone();
+            break;
+        }
     }
-
-    // 获取数据库路径
-    let db_path = &args[1];
 
     // 打开数据库
     let db = Database::open(db_path).expect("Failed to open database");

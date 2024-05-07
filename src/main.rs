@@ -1,14 +1,21 @@
 use redb::{Database, ReadableTable, TableDefinition};
-use std::io::{self, BufRead};
+use std::env;
+use std::process;
 
 const IMU_DATA_TABLE: TableDefinition<String, String> = TableDefinition::new("imu_data");
 
 fn main() -> redb::Result<()> {
-    // 获取用户输入的数据库路径
-    let mut db_path = String::new();
-    let stdin = io::stdin();
-    stdin.lock().read_line(&mut db_path).unwrap();
-    let db_path = db_path.trim(); // 去除多余的换行符
+    // 获取命令行参数
+    let args: Vec<String> = env::args().collect();
+
+    // 检查参数数量
+    if args.len() < 2 {
+        eprintln!("Usage: {} <database_path>", args[0]);
+        process::exit(1);
+    }
+
+    // 获取数据库路径
+    let db_path = &args[1];
 
     // 打开数据库
     let db = Database::open(db_path).expect("Failed to open database");

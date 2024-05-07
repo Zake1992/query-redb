@@ -1,7 +1,7 @@
 use redb::{Database, ReadableTable, TableDefinition};
 use std::io::{self, BufRead};
 
-const IMU_DATA_TABLE: TableDefinition<u64, String> = TableDefinition::new("imu_data");
+const IMU_DATA_TABLE: TableDefinition<String, String> = TableDefinition::new("imu_data");
 
 fn main() -> redb::Result<()> {
     // 获取用户输入的数据库路径
